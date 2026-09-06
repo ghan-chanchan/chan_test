@@ -301,16 +301,17 @@
     submitBtn.addEventListener('click', checkAnswer);
 
     function selectMode(mode) {
-        if (!quizScreen.classList.contains('active') && !resultScreen.classList.contains('active')) {
-            currentMode = mode;
-            const isPractice = mode === 'practice';
-            setupScreen.classList.toggle('active', !isPractice);
-            practiceSetupScreen.classList.toggle('active', isPractice);
-            wordStudyTab.classList.toggle('active', !isPractice);
-            practiceTab.classList.toggle('active', isPractice);
-            wordStudyTab.setAttribute('aria-selected', String(!isPractice));
-            practiceTab.setAttribute('aria-selected', String(isPractice));
-        }
+        currentMode = mode;
+        const isPractice = mode === 'practice';
+
+        quizScreen.classList.remove('active');
+        resultScreen.classList.remove('active');
+        setupScreen.classList.toggle('active', !isPractice);
+        practiceSetupScreen.classList.toggle('active', isPractice);
+        wordStudyTab.classList.toggle('active', !isPractice);
+        practiceTab.classList.toggle('active', isPractice);
+        wordStudyTab.setAttribute('aria-selected', String(!isPractice));
+        practiceTab.setAttribute('aria-selected', String(isPractice));
     }
 
     wordStudyTab.addEventListener('click', () => selectMode('word-study'));
