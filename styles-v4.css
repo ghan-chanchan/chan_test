@@ -61,6 +61,10 @@ select:focus, input[type="text"]:focus {
     border-color: #4A90E2;
 }
 
+#answer-input {
+    font-size: 18px;
+}
+
 button {
     width: 100%;
     padding: 12px;
@@ -103,7 +107,7 @@ button:hover {
 
 .card {
     background: #f8f9fa;
-    padding: 30px 20px;
+    padding: 25.5px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
     border: 1px solid #e9ecef;
