@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>영어 단어 테스트</title>
     <style>
         * {
@@ -215,7 +218,9 @@
     // CSV 파일 로드 함수
     async function loadCSV() {
         try {
-            const response = await fetch('words.csv');
+            const csvUrl = new URL('words.csv', window.location.href);
+            csvUrl.searchParams.set('v', Date.now());
+            const response = await fetch(csvUrl, { cache: 'no-store' });
             if (!response.ok) throw new Error("CSV 파일을 찾을 수 없습니다.");
             
             const data = await response.text();
