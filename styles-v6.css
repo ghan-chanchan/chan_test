@@ -29,6 +29,20 @@ h1 {
     font-size: 24px;
 }
 
+.install-btn {
+    width: auto;
+    padding: 8px 14px;
+    margin: -12px auto 20px;
+    background-color: #eef2f7;
+    color: #357ABD;
+    border: 1px solid #dce3ec;
+    font-size: 14px;
+}
+
+.install-btn:hover {
+    background-color: #e2e9f2;
+}
+
 .tabs {
     display: flex;
     gap: 8px;

@@ -1,0 +1,20 @@
+{
+  "name": "영어 단어 테스트",
+  "short_name": "단어 테스트",
+  "description": "단어공부와 실전voca 영어 단어 테스트",
+  "lang": "ko-KR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#4A90E2",
+  "background_color": "#f4f7f6",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

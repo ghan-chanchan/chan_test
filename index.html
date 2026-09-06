@@ -6,6 +6,13 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="영어 단어 테스트">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon.svg">
     <title>영어 단어 테스트</title>
     <link rel="stylesheet" href="styles-v6.css">
 </head>
@@ -13,6 +20,7 @@
 
 <div class="container">
     <h1>영어 단어 테스트 📝</h1>
+    <button id="install-btn" class="install-btn" hidden>홈 화면에 설치</button>
 
     <div class="tabs" role="tablist" aria-label="학습 모드">
         <button id="word-study-tab" class="tab active" role="tab" aria-selected="true">단어공부</button>
@@ -86,6 +94,7 @@
     const resultScore = document.getElementById('result-score');
     const wrongContainer = document.getElementById('wrong-container');
     const restartBtn = document.getElementById('restart-btn');
+    const installBtn = document.getElementById('install-btn');
 
     let currentMode = 'word-study';
     let allWords = [];
@@ -296,6 +305,27 @@
     }
 
     // 이벤트 리스너 연결
+    let deferredInstallPrompt;
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        installBtn.hidden = false;
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installBtn.hidden = true;
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        installBtn.hidden = true;
+    });
+
     startBtn.addEventListener('click', startQuiz);
     practiceStartBtn.addEventListener('click', startPracticeQuiz);
     submitBtn.addEventListener('click', checkAnswer);
@@ -332,6 +362,12 @@
 
     // 페이지 로드 시 CSV 파일 읽기
     window.addEventListener('DOMContentLoaded', async () => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js').catch((error) => {
+                console.error('서비스 워커 등록 실패:', error);
+            });
+        }
+
         allWords = await loadCSV('words.csv');
         practiceWords = await loadCSV('test.csv');
         initRoundSelect();
