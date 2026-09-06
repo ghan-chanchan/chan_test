@@ -29,6 +29,29 @@ h1 {
     font-size: 24px;
 }
 
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.tab {
+    padding: 10px;
+    background-color: #eef2f7;
+    color: #687386;
+    border: 1px solid #dce3ec;
+}
+
+.tab:hover {
+    background-color: #e2e9f2;
+}
+
+.tab.active {
+    background-color: #4A90E2;
+    color: white;
+    border-color: #4A90E2;
+}
+
 .screen {
     display: none;
 }
