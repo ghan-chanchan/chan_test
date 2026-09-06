@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영어 단어 테스트</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* 컨트롤 및 입력 양식 */
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #4A90E2;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        /* 진행상황 및 문제 화면 */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .meaning {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* 결과 화면 */
+        .result-box {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .result-score {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        .wrong-list {
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+
+        .wrong-item {
+            padding: 6px 0;
+            color: #e74c3c;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>영어 단어 테스트 📝</h1>
+
+    <div id="setup-screen" class="screen active">
+        <label for="round-select">회차를 선택하세요</label>
+        <select id="round-select">
+            <option value="">단어 데이터를 불러오는 중...</option>
+        </select>
+        <button id="start-btn" disabled>테스트 시작</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="progress-text" class="progress-text">0 / 40</div>
+
+        <div class="card">
+            <div id="meaning-display" class="meaning">뜻 불러오는 중...</div>
+        </div>
+
+        <input type="text" id="answer-input" placeholder="영어 단어를 입력하고 Enter" autocomplete="off" autofocus>
+        <button id="submit-btn">확인 (Enter)</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2>테스트 완료! 🎉</h2>
+        <div class="result-box">
+            <p class="result-score" id="result-score"></p>
+            <div id="wrong-container" class="wrong-list"></div>
+        </div>
+        <button id="restart-btn">다시 하기</button>
+    </div>
+</div>
+
+<script>
+    let allWords = [];
+    let currentQuizWords = [];
+    let currentIndex = 0;
+    let wrongAnswers = [];
+    const WORDS_PER_ROUND = 40;
+
+    // DOM 요소
+    const setupScreen = document.getElementById('setup-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    
+    const roundSelect = document.getElementById('round-select');
+    const startBtn = document.getElementById('start-btn');
+    
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const meaningDisplay = document.getElementById('meaning-display');
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    const resultScore = document.getElementById('result-score');
+    const wrongContainer = document.getElementById('wrong-container');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // CSV 파일 로드 함수
+    async function loadCSV() {
+        try {
+            const response = await fetch('words.csv');
+            if (!response.ok) throw new Error("CSV 파일을 찾을 수 없습니다.");
+            
+            const data = await response.text();
+            parseCSV(data);
+            initRoundSelect();
+        } catch (error) {
+            alert('words.csv 파일을 불러오는 데 실패했습니다.\n' + error.message);
+        }
+    }
+
+    // 간단한 CSV 파싱 (1행: 헤더 제외)
+    function parseCSV(text) {
+        const lines = text.trim().split('\n');
+        allWords = [];
+
+        // 첫 번째 행(헤더)을 건너뛰고 1번 인덱스부터 순회
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            
+            // 쉼표로 분할
+            const parts = line.split(',');
+            if (parts.length >= 3) {
+                const no = parseInt(parts[0].trim());
+                const word = parts[1].trim();
+                // 뜻에 쉼표가 들어갈 수 있으므로 3번째 열 이후는 다시 합침
+                const meaning = parts.slice(2).join(',').trim(); 
+
+                allWords.push({ no, word, meaning });
+            }
+        }
+    }
+
+    // 회차 셀렉트 박스 동적 생성
+    function initRoundSelect() {
+        const totalCount = allWords.length;
+        const totalRounds = Math.ceil(totalCount / WORDS_PER_ROUND);
+
+        roundSelect.innerHTML = '';
+        if (totalRounds === 0) {
+            roundSelect.innerHTML = '<option value="">단어가 없습니다</option>';
+            return;
+        }
+
+        for (let i = 1; i <= totalRounds; i++) {
+            const startNo = (i - 1) * WORDS_PER_ROUND + 1;
+            const endNo = Math.min(i * WORDS_PER_ROUND, totalCount);
+            
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i}회차 (No. ${startNo} ~ ${endNo})`;
+            roundSelect.appendChild(option);
+        }
+
+        startBtn.disabled = false;
+    }
+
+    // 배열 무작위 셔플 (피셔-예이츠)
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 테스트 시작
+    function startQuiz() {
+        const selectedRound = parseInt(roundSelect.value);
+        const startNo = (selectedRound - 1) * WORDS_PER_ROUND + 1;
+        const endNo = selectedRound * WORDS_PER_ROUND;
+
+        // 선택한 회차에 해당하는 단어 추출
+        const targetWords = allWords.filter(item => item.no >= startNo && item.no <= endNo);
+
+        if (targetWords.length === 0) {
+            alert('해당 회차에 단어가 없습니다.');
+            return;
+        }
+
+        // 40개 단어 랜덤 섞기
+        currentQuizWords = shuffle([...targetWords]);
+        currentIndex = 0;
+        wrongAnswers = [];
+
+        // 화면 전환
+        setupScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+
+        showQuestion();
+    }
+
+    // 문제 표시
+    function showQuestion() {
+        if (currentIndex >= currentQuizWords.length) {
+            finishQuiz();
+            return;
+        }
+
+        const currentWord = currentQuizWords[currentIndex];
+        meaningDisplay.textContent = currentWord.meaning;
+        answerInput.value = '';
+        answerInput.focus();
+
+        // 진행률 업데이트
+        const progressPercent = ((currentIndex) / currentQuizWords.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        progressText.textContent = `${currentIndex + 1} / ${currentQuizWords.length}`;
+    }
+
+    // 정답 제출 처리
+    function checkAnswer() {
+        const userAnswer = answerInput.value.trim().toLowerCase();
+        const currentWord = currentQuizWords[currentIndex];
+        const correctAnswer = currentWord.word.trim().toLowerCase();
+
+        if (userAnswer === '') return;
+
+        // 오답 처리
+        if (userAnswer !== correctAnswer) {
+            wrongAnswers.push({
+                meaning: currentWord.meaning,
+                correct: currentWord.word,
+                user: answerInput.value.trim()
+            });
+        }
+
+        currentIndex++;
+        showQuestion();
+    }
+
+    // 테스트 종료
+    function finishQuiz() {
+        quizScreen.classList.remove('active');
+        resultScreen.classList.add('active');
+
+        const total = currentQuizWords.length;
+        const wrongCount = wrongAnswers.length;
+        const correctCount = total - wrongCount;
+
+        resultScore.innerHTML = `총 ${total}문제 중 <strong>${correctCount}개</strong> 맞춤<br>
+                                <span style="color: #e74c3c;">(틀린 개수: ${wrongCount}개)</span>`;
+
+        wrongContainer.innerHTML = '';
+        if (wrongCount > 0) {
+            const title = document.createElement('h4');
+            title.textContent = "❌ 틀린 단어 목록";
+            wrongContainer.appendChild(title);
+
+            wrongAnswers.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'wrong-item';
+                div.innerHTML = `<strong>${item.meaning}</strong> : ${item.correct} <span style="color:#999;">(내가 쓴 답: ${item.user || '미입력'})</span>`;
+                wrongContainer.appendChild(div);
+            });
+        } else {
+            wrongContainer.innerHTML = '<p style="color: #4CAF50;">🎉 모두 맞췄습니다!</p>';
+        }
+    }
+
+    // 이벤트 리스너 연결
+    startBtn.addEventListener('click', startQuiz);
+    submitBtn.addEventListener('click', checkAnswer);
+    
+    answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkAnswer();
+    });
+
+    restartBtn.addEventListener('click', () => {
+        resultScreen.classList.remove('active');
+        setupScreen.classList.add('active');
+    });
+
+    // 페이지 로드 시 CSV 파일 읽기
+    window.addEventListener('DOMContentLoaded', loadCSV);
+</script>
+
+</body>
+</html>
