@@ -1,4 +1,4 @@
-no,word,meaning
+no,world,meaning
 1,a.m.,오전
 2,able,할 수 있는
 3,absent,결석한
@@ -39,43 +39,163 @@ no,word,meaning
 38,as,~처럼
 39,ashamed,부끄러운
 40,ask,묻다
-41, asleep ,자고있는
-42, at ,~에
-43, attend ,참석하다
-44, autumn ,가을
-45, away ,떨어져서
-46, background ,배경
-47, band ,밴드
-48, bar ,막대기
-49, base ,바닥
-50, basket ,바구니
-51, bath ,목욕
-52, beach ,해변
-53, because ,~때문에
-54, become ,~이 되다
-55, beef ,쇠고기
-56, before ,~전에
-57, begin ,시작하다
-58, believe ,믿다
-59, below ,~아래에
-60, belt ,허리띠
-61, bend ,굽히다
-62, between ,~사이에
-63, bill ,영수증
-64, bite ,물다
-65, blind ,눈이 안보이는
-66, block ,벽돌
-67, blow ,불다
-68, board ,"판자, 게시판"
-69, boot ,장화
-70, boring ,지루한
-71, borrow ,빌리다
-72, both ,둘 다
-73, bottle ,병
-74, bowl ,그릇
-75, brain ,두뇌
-76, brave ,용감한
-77, break ,깨트리다
-78, breathe ,숨쉬다
-79, bridge ,다리
-80, bright ,밝은
+41,asleep,자고있는
+42,at,~에
+43,attend,참석하다
+44,autumn,가을
+45,away,떨어져서
+46,background,배경
+47,band,밴드
+48,bar,막대기
+49,base,바닥
+50,basket,바구니
+51,bath,목욕
+52,beach,해변
+53,because,~때문에
+54,become,~이 되다
+55,beef,쇠고기
+56,before,~전에
+57,begin,시작하다
+58,believe,믿다
+59,below,~아래에
+60,belt,허리띠
+61,bend,굽히다
+62,between,~사이에
+63,bill,영수증
+64,bite,물다
+65,blind,눈이 안보이는
+66,block,벽돌
+67,blow,불다
+68,board,"판자, 게시판"
+69,boot,장화
+70,boring,지루한
+71,borrow,빌리다
+72,both,둘 다
+73,bottle,병
+74,bowl,그릇
+75,brain,두뇌
+76,brave,용감한
+77,break,깨트리다
+78,breathe,숨쉬다
+79,bridge,다리
+80,bright,밝은
+81,brilliant,훌륭한
+82,bring,가져오다
+83,build,"세우다, (건물을)짓다"
+84,burn,"타다, 태우다"
+85,but,그러나
+86,butter,버터
+87,by,~ 옆에
+88,calendar,달력
+89,cancel,취소하다
+90,capital,수도
+91,careful,주의깊은
+92,carrot,당근
+93,carry,옮기다
+94,catch,잡다
+95,ceiling,천장
+96,center,중앙
+97,chalk,분필
+98,chance,기회
+99,character,성격
+100,chase,추적하다
+101,cheap,값이 싼
+102,check,점검하다
+103,cheek,뺨
+104,cheer,응원
+105,chest,가슴
+106,child,어린이
+107,chin,턱
+108,choose,고르다
+109,clear,명백한
+110,clerk,점원
+111,climb,오르다
+112,clothes,옷
+113,coin,동전
+114,collect,수집하다
+115,comfortable,편안한
+116,company,회사
+117,compare,비교하다
+118,congratulate,축하하다
+119,consider,고려하다
+120,contest,대회
+121,convenient,편리한
+122,conversation,대화
+123,copy,복사하다
+124,corn,곡식
+125,corner,구석
+126,correct,맞는
+127,cost,값
+128,cough,기침하다
+129,count,계산하다
+130,country,나라
+131,crime,범죄
+132,curl,곱슬곱슬하다
+133,custom,관습
+134,cycle,"주기, 순환"
+135,danger,위험
+136,dangerous,위험한
+137,date,날짜
+138,dead,죽은
+139,decide,결정하다
+140,deep,깊은
+141,delicious,맛있는
+142,dentist,치과의사
+143,design,디자인
+144,die,죽다
+145,diet,식습관
+146,difference,차이
+147,different,다른
+148,difficult,어려운
+149,difficulty,"어려움, 문제점"
+150,dig,파다
+151,dirty,더러운
+152,discover,발견하다
+153,distance,거리
+154,dolphin,돌고래
+155,dot,점
+156,drive,운전하다
+157,drop,떨어지다
+158,drum,북
+159,dry,마른
+160,each,각각의
+161,early,일찍
+162,earth,지구
+163,east,동쪽
+164,easy,쉬운
+165,empty,비어있는
+166,end,"끝, 마지막"
+167,energy,힘
+168,enjoy,즐기다
+169,enough,충분한
+170,entrance,입구
+171,envy,부러움
+172,error,실수
+173,escape,탈출하다
+174,even,~조차
+175,ever,"지금까지, 이전에"
+176,everybody,각자 모두
+177,everything,모든 것
+178,everywhere,모든 곳
+179,examination,시험
+180,examine,관찰하다
+181,excellent,탁월한
+182,exciting,"흥분되는, 재미있는"
+183,exercise,운동
+184,expensive,비싼
+185,fact,사실
+186,fair,공정한
+187,famous,유명한
+188,far,먼
+189,fashion,패션
+190,feather,깃털
+191,fee,수수료
+192,feel,느끼다
+193,fever,열
+194,few,적은
+195,field,들판
+196,fight,싸우다
+197,finish,마치다
+198,fit,맞다
+199,flag,깃발
+200,flat,평평한
