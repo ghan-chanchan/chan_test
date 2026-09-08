@@ -20,12 +20,12 @@
 
 <div class="container">
     <h1>영어 단어 테스트 📝</h1>
-    <button id="install-btn" class="install-btn" hidden>홈 화면에 설치</button>
 
     <div class="tabs" role="tablist" aria-label="학습 모드">
         <button id="word-study-tab" class="tab active" role="tab" aria-selected="true">단어공부</button>
-        <button id="practice-tab" class="tab" role="tab" aria-selected="false">실전voca</button>
     </div>
+
+    <button id="install-btn" class="install-btn" hidden>앱 설치</button>
 
     <div id="setup-screen" class="screen active">
         <label for="round-select">단어공부 회차를 선택하세요</label>
@@ -35,19 +35,12 @@
         <button id="start-btn" disabled>테스트 시작</button>
     </div>
 
-    <div id="practice-setup-screen" class="screen">
-        <label for="practice-round-select">실전voca 회차를 선택하세요</label>
-        <select id="practice-round-select">
-            <option value="">단어 데이터를 불러오는 중...</option>
-        </select>
-        <button id="practice-start-btn" disabled>테스트 시작</button>
-    </div>
 
     <div id="quiz-screen" class="screen">
         <div class="progress-bar-container">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
-        <div id="progress-text" class="progress-text">0 / 40</div>
+        <div id="progress-text" class="progress-text">0 / 10</div>
 
         <div class="card">
             <div id="meaning-display" class="meaning">뜻 불러오는 중...</div>
@@ -71,19 +64,14 @@
     let currentQuizWords = [];
     let currentIndex = 0;
     let wrongAnswers = [];
-    const WORDS_PER_ROUND = 40;
+    const WORDS_PER_ROUND = 10;
 
     // DOM 요소
     const setupScreen = document.getElementById('setup-screen');
-    const practiceSetupScreen = document.getElementById('practice-setup-screen');
     const quizScreen = document.getElementById('quiz-screen');
     const resultScreen = document.getElementById('result-screen');
-    const wordStudyTab = document.getElementById('word-study-tab');
-    const practiceTab = document.getElementById('practice-tab');
     const roundSelect = document.getElementById('round-select');
-    const practiceRoundSelect = document.getElementById('practice-round-select');
     const startBtn = document.getElementById('start-btn');
-    const practiceStartBtn = document.getElementById('practice-start-btn');
     
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
@@ -98,7 +86,6 @@
 
     let currentMode = 'word-study';
     let allWords = [];
-    let practiceWords = [];
 
     // CSV 파일 로드 함수
     async function loadCSV(fileName) {
@@ -109,7 +96,7 @@
             if (!response.ok) throw new Error(`${fileName} 파일을 찾을 수 없습니다.`);
             
             const data = await response.text();
-            return parseCSV(data, fileName === 'test.csv');
+            return parseCSV(data);
         } catch (error) {
             alert(`${fileName} 파일을 불러오는 데 실패했습니다.\n${error.message}`);
             return [];
@@ -117,7 +104,7 @@
     }
 
     // 간단한 CSV 파싱 (1행: 헤더 제외)
-    function parseCSV(text, hasSession) {
+    function parseCSV(text) {
         const lines = text.trim().split('\n');
         const words = [];
 
@@ -128,12 +115,12 @@
             
             const parts = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g)
                 .map(part => part.replace(/^,/, '').replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-            if (parts.length >= (hasSession ? 4 : 3)) {
+            if (parts.length >= 4) {
                 words.push({
-                    session: hasSession ? parts[0] : null,
-                    no: parseInt(hasSession ? parts[1] : parts[0], 10),
-                    word: hasSession ? parts[2] : parts[1],
-                    meaning: hasSession ? parts.slice(3).join(',') : parts.slice(2).join(',')
+                    session: parts[0],
+                    no: parseInt(parts[1], 10),
+                    word: parts[2],
+                    meaning: parts.slice(3).join(',')
                 });
             }
         }
@@ -142,44 +129,24 @@
 
     // 회차 셀렉트 박스 동적 생성
     function initRoundSelect() {
-        const totalCount = allWords.length;
-        const totalRounds = Math.ceil(totalCount / WORDS_PER_ROUND);
+        const sessions = [...new Set(allWords.map(item => item.session).filter(Boolean))];
 
         roundSelect.innerHTML = '';
-        if (totalRounds === 0) {
-            roundSelect.innerHTML = '<option value="">단어가 없습니다</option>';
-            return;
-        }
-
-        for (let i = 1; i <= totalRounds; i++) {
-            const startNo = (i - 1) * WORDS_PER_ROUND + 1;
-            const endNo = Math.min(i * WORDS_PER_ROUND, totalCount);
-            
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `${i}회차 (No. ${startNo} ~ ${endNo})`;
-            roundSelect.appendChild(option);
-        }
-
-        startBtn.disabled = false;
-    }
-
-    function initPracticeRoundSelect() {
-        const sessions = [...new Set(practiceWords.map(item => item.session).filter(Boolean))];
-        practiceRoundSelect.innerHTML = '';
         if (sessions.length === 0) {
-            practiceRoundSelect.innerHTML = '<option value="">단어가 없습니다</option>';
+            roundSelect.innerHTML = '<option value="">단어가 없습니다</option>';
             return;
         }
 
         sessions.sort((first, second) => Number(first) - Number(second));
         sessions.forEach(session => {
+            const sessionWords = allWords.filter(item => item.session === session);
             const option = document.createElement('option');
             option.value = session;
-            option.textContent = `${session}회차`;
-            practiceRoundSelect.appendChild(option);
+            option.textContent = `${session}회차 (${sessionWords.length}개)`;
+            roundSelect.appendChild(option);
         });
-        practiceStartBtn.disabled = false;
+
+        startBtn.disabled = false;
     }
 
     // 배열 무작위 셔플 (피셔-예이츠)
@@ -193,20 +160,16 @@
 
     // 테스트 시작
     function startQuiz() {
-        currentMode = 'word-study';
-        const selectedRound = parseInt(roundSelect.value);
-        const startNo = (selectedRound - 1) * WORDS_PER_ROUND + 1;
-        const endNo = selectedRound * WORDS_PER_ROUND;
+        const selectedSession = roundSelect.value;
 
-        // 선택한 회차에 해당하는 단어 추출
-        const targetWords = allWords.filter(item => item.no >= startNo && item.no <= endNo);
+        // 선택한 session에 해당하는 단어 추출
+        const targetWords = allWords.filter(item => item.session === selectedSession);
 
         if (targetWords.length === 0) {
             alert('해당 회차에 단어가 없습니다.');
             return;
         }
 
-        // 40개 단어 랜덤 섞기
         currentQuizWords = shuffle([...targetWords]);
         currentIndex = 0;
         wrongAnswers = [];
@@ -215,24 +178,6 @@
         setupScreen.classList.remove('active');
         quizScreen.classList.add('active');
 
-        showQuestion();
-    }
-
-    function startPracticeQuiz() {
-        currentMode = 'practice';
-        const selectedSession = practiceRoundSelect.value;
-        const targetWords = practiceWords.filter(item => item.session === selectedSession);
-
-        if (targetWords.length === 0) {
-            alert('해당 회차에 단어가 없습니다.');
-            return;
-        }
-
-        currentQuizWords = shuffle([...targetWords]);
-        currentIndex = 0;
-        wrongAnswers = [];
-        practiceSetupScreen.classList.remove('active');
-        quizScreen.classList.add('active');
         showQuestion();
     }
 
@@ -296,7 +241,13 @@
             wrongAnswers.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'wrong-item';
-                div.innerHTML = `<strong>${item.meaning}</strong> : ${item.correct} <span style="color:#999;">(내가 쓴 답: ${item.user || '미입력'})</span>`;
+                const meaning = document.createElement('strong');
+                const correct = document.createTextNode(` : ${item.correct} `);
+                const user = document.createElement('span');
+                meaning.textContent = item.meaning;
+                user.style.color = '#999';
+                user.textContent = `(내가 쓴 답: ${item.user || '미입력'})`;
+                div.append(meaning, correct, user);
                 wrongContainer.appendChild(div);
             });
         } else {
@@ -327,25 +278,7 @@
     });
 
     startBtn.addEventListener('click', startQuiz);
-    practiceStartBtn.addEventListener('click', startPracticeQuiz);
     submitBtn.addEventListener('click', checkAnswer);
-
-    function selectMode(mode) {
-        currentMode = mode;
-        const isPractice = mode === 'practice';
-
-        quizScreen.classList.remove('active');
-        resultScreen.classList.remove('active');
-        setupScreen.classList.toggle('active', !isPractice);
-        practiceSetupScreen.classList.toggle('active', isPractice);
-        wordStudyTab.classList.toggle('active', !isPractice);
-        practiceTab.classList.toggle('active', isPractice);
-        wordStudyTab.setAttribute('aria-selected', String(!isPractice));
-        practiceTab.setAttribute('aria-selected', String(isPractice));
-    }
-
-    wordStudyTab.addEventListener('click', () => selectMode('word-study'));
-    practiceTab.addEventListener('click', () => selectMode('practice'));
     
     answerInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') checkAnswer();
@@ -353,11 +286,7 @@
 
     restartBtn.addEventListener('click', () => {
         resultScreen.classList.remove('active');
-        if (currentMode === 'practice') {
-            practiceSetupScreen.classList.add('active');
-        } else {
-            setupScreen.classList.add('active');
-        }
+        setupScreen.classList.add('active');
     });
 
     // 페이지 로드 시 CSV 파일 읽기
@@ -369,9 +298,7 @@
         }
 
         allWords = await loadCSV('words.csv');
-        practiceWords = await loadCSV('test.csv');
         initRoundSelect();
-        initPracticeRoundSelect();
     });
 </script>
 

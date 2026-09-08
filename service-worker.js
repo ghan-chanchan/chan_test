@@ -1,12 +1,11 @@
-const CACHE_NAME = 'word-study-v1';
+const CACHE_NAME = 'word-study-v2';
 const APP_SHELL = [
     './',
     './index.html',
     './styles-v6.css',
     './manifest.webmanifest',
     './icon.svg',
-    './words.csv',
-    './test.csv'
+    './words.csv'
 ];
 
 self.addEventListener('install', (event) => {
